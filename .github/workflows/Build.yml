@@ -25,3 +25,6 @@ jobs:
       run: qmake ultracopier.pro
     - name: make
       run: make -j$(nproc)
+    - uses: actions/upload-artifact@v3
+      with:
+        path: ./ultracopier*.*
