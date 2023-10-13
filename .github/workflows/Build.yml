@@ -13,6 +13,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: update shit
+      run: sudo sed -i -e 's/archive.ubuntu.com\|security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list
     - name: install dependencies
       run: sudo apt install -y make gcc qtmultimedia5-dev libogg-dev libopus-dev libgl1-mesa-dev build-essential libssl-dev qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools gcc-multilib qttools5-dev-tools
     - name: find file 
