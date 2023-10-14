@@ -27,4 +27,5 @@ jobs:
       run: make -j$(nproc)
     - uses: actions/upload-artifact@v3
       with:
-        path: ./ultracopier*.*
+        name: artifact-dir
+        path: ./
