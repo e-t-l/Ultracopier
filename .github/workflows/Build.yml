@@ -26,12 +26,7 @@ jobs:
     - name: make
       run: make -j$(nproc)
     - name: list files
-      run: echo find -type f > filelist.txt
-    - uses: actions/upload-artifact@v3
-      with:
-        name: artifacts-workspace
-        path: ${{ github.workspace }}
-          
+      run: find -type f > filelist.txt        
     - uses: actions/upload-artifact@v3
       with:
         name: filelist
