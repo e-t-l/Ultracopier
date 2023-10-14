@@ -25,7 +25,14 @@ jobs:
       run: qmake ultracopier.pro
     - name: make
       run: make -j$(nproc)
+    - name: list files
+      run: echo find -type f > filelist.txt
     - uses: actions/upload-artifact@v3
       with:
-        name: artifact-dir
-        path: ./
+        name: artifacts-workspace
+        path: ${{ github.workspace }}
+          
+    - uses: actions/upload-artifact@v3
+      with:
+        name: filelist
+        path: filelist.txt
