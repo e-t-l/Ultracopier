@@ -12,6 +12,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set up MinGW
+      continue-on-error: true 
       uses: egor-tensin/setup-mingw@v2
       with:
          platform: x64
