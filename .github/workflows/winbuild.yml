@@ -1,0 +1,56 @@
+name: Win Build
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: windows-latest # For Linux, use ubuntu-latest
+    environment: dev
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v3
+
+   - name: Set up MinGW
+       uses: egor-tensin/setup-mingw@v2
+       with:
+         platform: x64
+    
+    - name: Install Qt5 x64
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          version: '5.15.2'
+          host: 'windows'
+      #    dir: ..
+      #    arch:  ${{ matrix.qt-target }}
+          arch:  'win64_msvc2019_64'
+          tools: 'tools_qtcreator,qt.tools.qtcreator'
+      #    cached: ${{ steps.cache-qt.outputs.cache-hit }}
+          cache: true 
+
+    - name: qmake
+      run: ..\Qt\5.15.2\msvc2019\bin\qmake.exe ultracopier.pro
+      continue-on-error: true 
+    - name: make1
+      id: make1
+      run: make -i -j%NUMBER_OF_PROCESSORS%
+    - name: make2
+      id: make2
+      if: steps.make1.outcome != 'success'
+      run: make /i /j%NUMBER_OF_PROCESSORS%
+    - name: make3
+      if: steps.make1.outcome != 'success' && steps.make2.outcome != 'success'
+      run: make
+    - name: list files
+      run: dir > filelist.txt        
+    - uses: actions/upload-artifact@v3
+      with:
+        name: filelist
+        path: filelist.txt
+    - uses: actions/upload-artifact@v3
+      with:
+        name: exes
+        path: *.exe
