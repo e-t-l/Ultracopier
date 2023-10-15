@@ -31,18 +31,25 @@ jobs:
           cache: true 
 
     - name: qmake
-      run: ..\Qt\5.15.2\msvc2019\bin\qmake.exe ultracopier.pro
+      run: D:\a\Ultracopier\Qt\5.15.2\msvc2019_64\bin\qmake.exe ultracopier.pro
       continue-on-error: true 
+    - name: make exist
+      run: |
+        $makepath = (Get-Childitem –Path C:\ -Recurse bcuninstaller.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
+        cmd /c mklink C:\ProgramData\Chocolatey\lib\mingw\tools\install\mingw64\bin\mingw32-make.exe $makepath -erroraction ignore
     - name: make1
       id: make1
       run: make -i -j%NUMBER_OF_PROCESSORS%
+      continue-on-error: true 
     - name: make2
       id: make2
       if: steps.make1.outcome != 'success'
       run: make /i /j%NUMBER_OF_PROCESSORS%
+      continue-on-error: true 
     - name: make3
       if: steps.make1.outcome != 'success' && steps.make2.outcome != 'success'
       run: make
+      continue-on-error: true 
     - name: list files
       run: dir > filelist.txt        
     - uses: actions/upload-artifact@v3
