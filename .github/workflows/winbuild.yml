@@ -1,8 +1,6 @@
 name: Win Build
 
-on:
-  push:
-    branches: [ "master" ]
+on: workflow_dispatch
 
 jobs:
   build:
@@ -13,14 +11,14 @@ jobs:
     - name: 'Checkout GitHub Action'
       uses: actions/checkout@v3
 
-   - name: Set up MinGW
-       uses: egor-tensin/setup-mingw@v2
-       with:
+    - name: Set up MinGW
+      uses: egor-tensin/setup-mingw@v2
+      with:
          platform: x64
     
     - name: Install Qt5 x64
-        uses: jurplel/install-qt-action@v3
-        with:
+      uses: jurplel/install-qt-action@v3
+      with:
           aqtversion: '==3.1.*'
           version: '5.15.2'
           host: 'windows'
@@ -53,4 +51,4 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: exes
-        path: *.exe
+        path: .\*.exe
