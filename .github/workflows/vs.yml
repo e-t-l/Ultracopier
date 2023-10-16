@@ -10,23 +10,22 @@ jobs:
     steps:
     - name: 'Checkout GitHub Action'
       uses: actions/checkout@v4
+      
+    - name: Setup VS Dev Environment
+      uses: seanmiddleditch/gha-setup-vsdevenv@v4
+  
+#    - name: Setup msbuild
+#      uses: microsoft/setup-msbuild@v1.3
 
-    - name: Setup msbuild
-      uses: microsoft/setup-msbuild@v1.3
-
-    - name: Set up myMinGW
+    - name: Enable Developer Command Prompt           
+      uses: ilammy/msvc-dev-cmd@v1.12.1
+      
+    - name: Set up my MinGW
       id: myMinGW
       continue-on-error: true 
       uses: e-t-l/setup-mingw@v2.2.0-e
       with:
          platform: x64
-         
-#    - name: Set up MinGW
-#      continue-on-error: true 
-#      if: steps.myMinGW.outcome != 'success'
-#      uses: egor-tensin/setup-mingw@v2
-#      with:
-#         platform: x64
     
     - name: Install Qt5 x64
       uses: jurplel/install-qt-action@v3
@@ -44,13 +43,17 @@ jobs:
     - name: validate
       run: |
         $makepath = (Get-Childitem –Path C:\ -Recurse mingw32-make.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
-        cmd /c mklink C:\ProgramData\Chocolatey\lib\mingw\tools\install\mingw64\bin\mingw32-make.exe '$makepath' -erroraction ignore
+        If ($makepath) {Copy-Item "$makepath" -Destination "C:\ProgramData\Chocolatey\lib\mingw\tools\install\mingw64\bin\mingw32-make.exe" -erroraction ignore} else {Get-Childitem –Path D:\ -Recurse mingw32-make.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName}
+        If ($makepath) {Copy-Item "$makepath" -Destination "C:\ProgramData\Chocolatey\lib\mingw\tools\install\mingw64\bin\mingw32-make.exe" -erroraction ignore}
+        If ($makepath) {echo $makepath} else {echo "mingw32-make.exe not found on C or D drives!"}
 #        $clpath1 = (Get-Childitem –Path D:\ -Recurse cl.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
 #        $Env:Path += [IO.Path]::PathSeparator + '$clpath1'
 #        $clpath2 = (Get-Childitem –Path C:\ -Recurse cl.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
 #        $Env:Path += [IO.Path]::PathSeparator + '$clpath2'
 #        echo $clpath1
 #        echo $clpath2
+      continue-on-error: true 
+      
     - name: qmake
       run: qmake ultracopier.pro
       continue-on-error: true 
