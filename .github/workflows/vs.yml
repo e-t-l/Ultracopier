@@ -1,0 +1,72 @@
+name: WinBuildVS
+
+on: workflow_dispatch
+
+jobs:
+  build:
+
+    runs-on: windows-latest # For Linux, use ubuntu-latest
+    environment: dev
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v4
+
+    - name: Setup msbuild
+      uses: microsoft/setup-msbuild@v1.3
+
+    - name: Set up myMinGW
+      id: myMinGW
+      continue-on-error: true 
+      uses: e-t-l/setup-mingw@v2
+      with:
+         platform: x64
+         
+#    - name: Set up MinGW
+#      continue-on-error: true 
+#      if: steps.myMinGW.outcome != 'success'
+#      uses: egor-tensin/setup-mingw@v2
+#      with:
+#         platform: x64
+    
+    - name: Install Qt5 x64
+      uses: jurplel/install-qt-action@v3
+      with:
+          aqtversion: '==3.1.*'
+          version: '5.15.2'
+          host: 'windows'
+      #    dir: ..
+      #    arch:  ${{ matrix.qt-target }}
+          arch:  'win64_msvc2019_64'
+          tools: 'tools_qtcreator,qt.tools.qtcreator'
+      #    cached: ${{ steps.cache-qt.outputs.cache-hit }}
+          cache: true 
+          
+    - name: validate cl
+      run: |
+        $clpath1 = (Get-Childitem –Path D:\ -Recurse cl.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
+        $Env:Path += [IO.Path]::PathSeparator + '$clpath1'
+        $clpath2 = (Get-Childitem –Path C:\ -Recurse cl.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
+        $Env:Path += [IO.Path]::PathSeparator + '$clpath2'
+        echo $clpath1
+        echo $clpath2
+    - name: qmake
+      run: qmake ultracopier.pro
+      continue-on-error: true 
+    - name: make1
+      id: make1
+      run: make -i -j2
+      continue-on-error: true 
+    - name: make2
+      id: make2
+      if: steps.make1.outcome != 'success'
+      run: |
+        dir
+        $mfpath = (Get-Childitem –Path ~ -Recurse makefile -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
+        $Env:Path += [IO.Path]::PathSeparator + '$mfpath'
+        make -i -j2 makefile
+      continue-on-error: true 
+      
+    - uses: actions/upload-artifact@v3
+      with:
+        name: exes
+        path: .\*.exe
