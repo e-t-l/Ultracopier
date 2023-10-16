@@ -1,4 +1,4 @@
-name: Win Build
+name: WinBuild
 
 on: workflow_dispatch
 
@@ -11,7 +11,7 @@ jobs:
     - name: 'Checkout GitHub Action'
       uses: actions/checkout@v3
 
-    - name: Set up MinGW
+    - name: Set up myMinGW
       id: myMinGW
       continue-on-error: true 
       uses: e-t-l/setup-mingw@v2
