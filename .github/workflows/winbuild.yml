@@ -40,13 +40,19 @@ jobs:
           
     - name: validate
       run: |
-        set path=%path%;%qtdir%\bin
+        set path=%path%;D:\a\Ultracopier\Qt\5.15.2\msvc2019_64\bin
+        $batpath = (Get-Childitem –Path D:\ -Recurse vcvars*.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
+        Start-Process -FilePath '$batpath' -Wait
+
+    - name: validate
+      run: |
+        set path=%path%;D:\a\Ultracopier\Qt\5.15.2\msvc2019_64\bin
         $makepath = (Get-Childitem –Path C:\ -Recurse mingw32-make.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
         cmd /c mklink C:\ProgramData\Chocolatey\lib\mingw\tools\install\mingw64\bin\mingw32-make.exe '$makepath' -erroraction ignore
-        $batpath = (Get-Childitem –Path C:\ -Recurse vcvars*.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
+        $batpath = (Get-Childitem –Path D:\ -Recurse vcvars*.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
         Start-Process -FilePath '$batpath' -Wait
     - name: qmake
-      run: D:\a\Ultracopier\Qt\5.15.2\msvc2019_64\bin\qmake.exe ultracopier.pro
+      run: qmake ultracopier.pro
       continue-on-error: true 
     - name: make1
       id: make1
