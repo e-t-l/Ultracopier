@@ -63,7 +63,6 @@ jobs:
         make -i -j2 makefile
       continue-on-error: true 
       
-    - name: upload
     - uses: actions/upload-artifact@v3
       with:
         name: exes
