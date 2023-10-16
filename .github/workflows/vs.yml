@@ -43,9 +43,9 @@ jobs:
           
     - name: validate cl
       run: |
-        $clpath1 = (Get-Childitem –Path D:\ -Recurse cl.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
+        $clpath1 = (Get-Childitem –Path D:\ -Recurse cl.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
         $Env:Path += [IO.Path]::PathSeparator + '$clpath1'
-        $clpath2 = (Get-Childitem –Path C:\ -Recurse cl.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
+        $clpath2 = (Get-Childitem –Path C:\ -Recurse cl.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
         $Env:Path += [IO.Path]::PathSeparator + '$clpath2'
         echo $clpath1
         echo $clpath2
