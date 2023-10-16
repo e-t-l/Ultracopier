@@ -44,6 +44,8 @@ jobs:
         $Env:Path += [IO.Path]::PathSeparator + '$clpath1'
         $clpath2 = (Get-Childitem –Path C:\ -Recurse cl.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
         $Env:Path += [IO.Path]::PathSeparator + '$clpath2'
+        echo $clpath1
+        echo $clpath2
     - name: qmake
       run: qmake ultracopier.pro
       continue-on-error: true 
@@ -55,17 +57,13 @@ jobs:
       id: make2
       if: steps.make1.outcome != 'success'
       run: |
+        dir
         $mfpath = (Get-Childitem –Path ~ -Recurse makefile -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
         $Env:Path += [IO.Path]::PathSeparator + '$mfpath'
         make -i -j2 makefile
       continue-on-error: true 
       
-    - name: list files
-      run: dir > filelist.txt        
-    - uses: actions/upload-artifact@v3
-      with:
-        name: filelist
-        path: filelist.txt
+    - name: upload
     - uses: actions/upload-artifact@v3
       with:
         name: exes
