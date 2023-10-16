@@ -38,35 +38,28 @@ jobs:
       #    cached: ${{ steps.cache-qt.outputs.cache-hit }}
           cache: true 
           
-    - name: validate
+    - name: validate cl
       run: |
-        $Env:Path += [IO.Path]::PathSeparator + 'D:\a\Ultracopier\Qt\5.15.2\msvc2019_64\bin'
-        $batpath = (Get-Childitem –Path D:\ -Recurse vcvars*.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
-        Start-Process -FilePath '$batpath' -Wait
-
-    - name: validate
-      run: |
-        set path=%path%;D:\a\Ultracopier\Qt\5.15.2\msvc2019_64\bin
-        $makepath = (Get-Childitem –Path C:\ -Recurse mingw32-make.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
-        cmd /c mklink C:\ProgramData\Chocolatey\lib\mingw\tools\install\mingw64\bin\mingw32-make.exe '$makepath' -erroraction ignore
-        $batpath = (Get-Childitem –Path D:\ -Recurse vcvars*.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
-        Start-Process -FilePath '$batpath' -Wait
+        $clpath1 = (Get-Childitem –Path D:\ -Recurse cl.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
+        $Env:Path += [IO.Path]::PathSeparator + '$clpath1'
+        $clpath2 = (Get-Childitem –Path C:\ -Recurse cl.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
+        $Env:Path += [IO.Path]::PathSeparator + '$clpath2'
     - name: qmake
       run: qmake ultracopier.pro
       continue-on-error: true 
     - name: make1
       id: make1
-      run: make -i -j%NUMBER_OF_PROCESSORS%
+      run: make -i -j2
       continue-on-error: true 
     - name: make2
       id: make2
       if: steps.make1.outcome != 'success'
-      run: make /i /j%NUMBER_OF_PROCESSORS%
+      run: |
+        $mfpath = (Get-Childitem –Path ~ -Recurse makefile -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName | Split-Path -Parent)
+        $Env:Path += [IO.Path]::PathSeparator + '$mfpath'
+        make -i -j2 makefile
       continue-on-error: true 
-    - name: make3
-      if: steps.make1.outcome != 'success' && steps.make2.outcome != 'success'
-      run: make
-      continue-on-error: true 
+      
     - name: list files
       run: dir > filelist.txt        
     - uses: actions/upload-artifact@v3
