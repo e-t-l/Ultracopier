@@ -27,8 +27,8 @@ jobs:
     - name: validate
       run: |
         $Env:Path += [IO.Path]::PathSeparator + 'D:\a\Ultracopier\Qt\5.15.2\msvc2019_64\bin'
-        $batpath = (Get-Childitem –Path D:\ -Recurse vcvars*.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
-        Start-Process -FilePath '$batpath' -Wait
+  #      $batpath = (Get-Childitem –Path D:\ -Recurse vcvars*.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
+  #      Start-Process -FilePath '$batpath' -Wait
     - name: qmake
       run: qmake ultracopier.pro
       continue-on-error: true 
