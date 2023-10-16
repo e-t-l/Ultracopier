@@ -26,11 +26,11 @@ jobs:
           
     - name: validate
       run: |
-        set path=%path%;%qtdir%\bin
-        $batpath = (Get-Childitem –Path C:\ -Recurse vcvars*.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
+        set path=%path%;D:\a\Ultracopier\Qt\5.15.2\msvc2019_64\bin
+        $batpath = (Get-Childitem –Path D:\ -Recurse vcvars*.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
         Start-Process -FilePath '$batpath' -Wait
     - name: qmake
-      run: D:\a\Ultracopier\Qt\5.15.2\msvc2019_64\bin\qmake.exe ultracopier.pro
+      run: qmake ultracopier.pro
       continue-on-error: true 
     - name: make1
       id: make1
