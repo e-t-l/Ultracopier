@@ -12,7 +12,15 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Set up MinGW
+      id: myMinGW
       continue-on-error: true 
+      uses: e-t-l/setup-mingw@v2
+      with:
+         platform: x64
+         
+    - name: Set up MinGW
+      continue-on-error: true 
+      if: steps.myMinGW.outcome != 'success'
       uses: egor-tensin/setup-mingw@v2
       with:
          platform: x64
@@ -29,14 +37,17 @@ jobs:
           tools: 'tools_qtcreator,qt.tools.qtcreator'
       #    cached: ${{ steps.cache-qt.outputs.cache-hit }}
           cache: true 
-
+          
+    - name: validate
+      run: |
+        set path=%path%;%qtdir%\bin
+        $makepath = (Get-Childitem –Path C:\ -Recurse mingw32-make.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
+        cmd /c mklink C:\ProgramData\Chocolatey\lib\mingw\tools\install\mingw64\bin\mingw32-make.exe '$makepath' -erroraction ignore
+        $batpath = (Get-Childitem –Path C:\ -Recurse vcvars*.bat -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
+        Start-Process -FilePath '$batpath' -Wait
     - name: qmake
       run: D:\a\Ultracopier\Qt\5.15.2\msvc2019_64\bin\qmake.exe ultracopier.pro
       continue-on-error: true 
-    - name: make exist
-      run: |
-        $makepath = (Get-Childitem –Path C:\ -Recurse mingw32-make.exe -erroraction ignore | select -first 1 | Select-Object -ExpandProperty FullName)
-        cmd /c mklink C:\ProgramData\Chocolatey\lib\mingw\tools\install\mingw64\bin\mingw32-make.exe '$makepath' -erroraction ignore
     - name: make1
       id: make1
       run: make -i -j%NUMBER_OF_PROCESSORS%
